@@ -223,7 +223,7 @@ function showMovies(data) {
                 <h3>${title}</h3>
                 ${overview}
                 <br/> 
-                <button class="know-more" id="${id}">Watch Trailer <i class="fas fa-arrow-right"></i></button
+                <button class="know-more" id="${id}">View More<i class="fas fa-arrow-right"></i></button
             </div>
         
         `;
@@ -237,7 +237,7 @@ function showMovies(data) {
   });
 }
 
-/* Open when someone clicks on the span element */
+/* Open when someone clicks on the span element, youtube video area*/
 const overlayContent = document.getElementById("overlay-content");
 function openNav(movie) {
   let id = movie.id;
@@ -252,7 +252,39 @@ function openNav(movie) {
           var dots = [];
           videoData.results.forEach((video, idx) => {
             let { name, key, site } = video;
+              then((detailedData) => {
+      console.log(detailedData);
 
+      const {
+        credits,
+        overview,
+        revenue,
+        vote_average,
+      } = detailedData;
+
+      // Populate the template with additional details
+      template.querySelector("#movie-director").textContent = getDirector(credits.crew);
+      template.querySelector("#movie-actors").textContent = getActors(credits.cast);
+      template.querySelector("#movie-synopsis").textContent = overview;
+      template.querySelector("#movie-box-office").textContent = formatCurrency(revenue);
+      template.querySelector("#movie-rating").textContent = vote_average;
+
+      overlayContent.innerHTML = ""; // Clear existing content
+      overlayContent.appendChild(template);
+    });
+    function getDirector(crew) {
+      const director = crew.find((member) => member.job === "Director");
+      return director ? director.name : "N/A";
+    }
+    
+    function getActors(cast) {
+      const actorNames = cast.slice(0, 3).map((actor) => actor.name);
+      return actorNames.join(", ");
+    }
+    
+    function formatCurrency(amount) {
+      return "$" + amount.toLocaleString();
+    }
             if (site == "YouTube") {
               embed.push(`
               <iframe width="560" height="315" src="https://www.youtube.com/embed/${key}" title="${name}" class="embed hide" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -278,7 +310,7 @@ function openNav(movie) {
           activeSlide = 0;
           showVideos();
         } else {
-          overlayContent.innerHTML = `<h1 class="no-results">No Results Found 😥</h1>`;
+          overlayContent.innerHTML = `<h1 class="no-results">Oops, No Results Found</h1>`;
         }
       }
     });
@@ -391,3 +423,8 @@ function pageCall(page) {
     getMovies(url);
   }
 }
+
+
+
+//Test//
+
